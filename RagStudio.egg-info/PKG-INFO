@@ -1,0 +1,25 @@
+Metadata-Version: 2.1
+Name: RagStudio
+Version: 0.1
+Summary: Manage and create Vector retrieval collections
+Home-page: yourprojecturl.com
+Author: <Johnny2x2>
+Author-email: youremail@email.com
+Classifier: Programming Language :: Python :: 3
+Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown
+
+# Rag_Studio
+vector rag creation servers
+
+#Install
+
+#Build image
+docker build -t ragstudio .
+
+#Run Container
+docker run -it -p 8501:8501 --name Rag-Studio ragstudio
+
+#Access localhost from browser
+
+http://localhost:8501/

@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+setup.cfg
+setup.py
+RagStudio.egg-info/PKG-INFO
+RagStudio.egg-info/SOURCES.txt
+RagStudio.egg-info/dependency_links.txt
+RagStudio.egg-info/top_level.txt
