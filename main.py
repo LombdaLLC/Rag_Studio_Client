@@ -71,7 +71,7 @@ def main():
     user = st.session_state["user"] 
     st.subheader(f"Welcome: {user}") #Title
     
-    URL_STRING = "https://ragstudio.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=1687t8u3293rqmnaji7m60pdss&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+user-s3-resource-scope-id%2Freadwrite&redirect_uri=http%3A%2F%2Flocalhost%3A8501%2F"
+    URL_STRING = "https://ragstudio.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=1687t8u3293rqmnaji7m60pdss&response_type=code&scope=aws.cognito.signin.user.admin+email+openid+user-s3-resource-scope-id%2Freadwrite&redirect_uri=https%3A%2F%2Fragstudio.streamlit.app%2F"
     st.markdown(
     f'<a href="{URL_STRING}" style="display: inline-block; padding: 12px 20px; background-color: #4CAF50; color: white; text-align: center; text-decoration: none; font-size: 16px; border-radius: 4px;" target="_self">Sign In Here</a>',
     unsafe_allow_html=True)
