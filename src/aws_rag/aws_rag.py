@@ -176,24 +176,56 @@ def retrieve_parents(question, file_name, access_token, lombda_key, openai_api_k
     
     return json.loads(response.text)
 
-def add_documents(access_token, collection, lombda_key, model, chunks):
+def add_embedding(access_token, collection, lombda_key, model, chunks):
     #removed api from gateway for testing
     headers = {
         'Authorization': access_token, 
         'ContentType':'application/json', 
-        'x-api-key' : lombda_key}
-    _params = {"path":"parent","db":collection,"db_type":"collection", "model":model}
+        'x-api-key' : lombda_key
+        }
+    
+    _params = {"source":collection, "model":model}
+    
     response = requests.post(f'{host}/content/add', 
                             headers=headers, 
                             params=_params,
-                            data=json.dumps(chunks))
-    
-    print(response.status_code)
-    print(response.text)
-    
+                            data=chunks)
+    print("got response")
+    print(response)
+
     if response.status_code != 200:
         print(response.status_code)
         print(response.text)
         return response
     
+    print(response.status_code)
+    print(response.text)
+        
+    return json.loads(response.text)
+
+def add_document(access_token, collection, lombda_key, model, chunks):
+    #removed api from gateway for testing
+    headers = {
+        'Authorization': access_token, 
+        'ContentType':'application/json', 
+        'x-api-key' : lombda_key
+        }
+    
+    _params = {"source":collection, "model":model}
+    
+    response = requests.post(f'{host}/content/doc', 
+                            headers=headers, 
+                            params=_params,
+                            data=chunks)
+    print("got response")
+    print(response)
+
+    if response.status_code != 200:
+        print(response.status_code)
+        print(response.text)
+        return response
+    
+    print(response.status_code)
+    print(response.text)
+        
     return json.loads(response.text)
