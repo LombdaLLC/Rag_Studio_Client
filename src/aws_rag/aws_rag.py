@@ -9,13 +9,15 @@ import json
 #request(method, url, args)	Sends a request of the specified method to the specified url
 
 stage = 'prod'
-host = f"https://dsft6rxl8j.execute-api.us-east-1.amazonaws.com/{stage}"
+#host = f"https://0t75xip2ok.execute-api.us-east-1.amazonaws.com/{stage}" #AWS HOST NAME
+host = f"http://15rvzgjdkw.execute-api.localhost.localstack.cloud:4566/{stage}" #LOCALSTACK HOST NAME
 
 #host = "http://127.0.0.1:3000"
 def get_user_name(access_token):
     
     headers = {'Authorization': access_token, "ContentType":"application/json"}
-    response = requests.put(f'{host}/content/manage', headers=headers, data=json.dumps({"code":access_token, "func":"username", "source":"next"}))
+    _params = {"code":access_token, "path":"username", "source":"next"}
+    response = requests.get(f'{host}/content/manage', headers=headers, params=_params)
     
     if response.status_code != 200:
         print(response.status_code)
@@ -27,7 +29,8 @@ def get_user_name(access_token):
 def get_collections(access_token):
     
     headers = {'Authorization': access_token, 'ContentType':"application/json"}
-    response = requests.put(f'{host}/content/manage', headers=headers, data=json.dumps({"access_token":access_token,"func":"get_collections"}))
+    _params = {"path":"get_collections", "source":"next"}
+    response = requests.get(f'{host}/content/manage', headers=headers, params=_params)
     
     if response.status_code != 200:
         print(response.status_code)
@@ -38,7 +41,8 @@ def get_collections(access_token):
 def get_access_url(file_name, access_token, openai_api_key, model):
     
     headers = {'Authorization': access_token, 'ContentType':"application/json"}
-    response = requests.put(f'{host}/content/upload', headers=headers, data=json.dumps({"access_token":access_token,"file_name":file_name, "apitoken":openai_api_key, "model":model}))
+    _params = {"file_name":file_name, "apitoken":openai_api_key, "model":model}
+    response = requests.get(f'{host}/content/upload', headers=headers, params=_params)
     
     if response.status_code != 200:
         print(response.status_code)
@@ -48,9 +52,9 @@ def get_access_url(file_name, access_token, openai_api_key, model):
     return json.loads(response.text)
 
 def get_user_files(access_token):
-    
     headers = {'Authorization': access_token, 'ContentType':"application/json"}
-    response = requests.put(f'{host}/content/manage', headers=headers, data=json.dumps({"code":access_token,"func":"get_files"}))
+    _params = {"path":"get_files", "source":"next"}
+    response = requests.get(f'{host}/content/manage', headers=headers, params=_params)
     
     if response.status_code != 200:
         print(response.status_code)
@@ -82,7 +86,8 @@ def delete_user_files(access_token, db_type, source):
         func = "delete_collection"
         
     headers = {'Authorization': access_token, 'ContentType':"application/json"}
-    response = requests.put(f'{host}/content/manage', headers=headers, data=json.dumps({"code":access_token, "func":func, "source":source}))
+    _params = {"path":func, "source":source}
+    response = requests.get(f'{host}/content/manage', headers=headers, params=_params)
     
     if response.status_code != 200:
         print(response.status_code)
@@ -94,7 +99,7 @@ def delete_user_files(access_token, db_type, source):
 # Function to upload file using a presigned URL
 def upload_file_to_s3(presigned_url, file_path):
     with open(file_path, 'rb') as f:
-        response = requests.put(presigned_url, data=f)
+        response = requests.put(presigned_url, data=f, timeout=120)
         print(response)
         return response
 
@@ -106,19 +111,82 @@ def ask_qa(question, file_name, access_token, lombda_key, openai_api_key, model,
         'Authorization': access_token, 
         'ContentType':'application/json', 
         'x-api-key' : lombda_key}
-    
-    response = requests.put(f'{host}/content/query', 
+    _params = {"path":"qa","db":file_name,"db_type":db_type, "apitoken":openai_api_key, "model":model, "num_results":num_results, "chat_model":chat_model}
+    response = requests.post(f'{host}/content/query', 
                             headers=headers, 
-                            data=json.dumps({
-                                "query":question,
-                                "code":access_token,
-                                "db":file_name, 
-                                "db_type":db_type,
-                                "apitoken":openai_api_key, 
-                                "model":model, 
-                                "num_results":num_results, 
-                                "func":"qa",
-                                "chat_model":chat_model}))
+                            params=_params,
+                            data=question)
+    
+    print(response.status_code)
+    print(response.text)
+    
+    if response.status_code != 200:
+        print(response.status_code)
+        print(response.text)
+        return response
+    
+    return json.loads(response.text)
+
+
+def retrieve_chunks(question, file_name, access_token, lombda_key, openai_api_key, model, db_type, num_results: int = 3):
+    
+    #removed api from gateway for testing
+    
+    headers = {
+        'Authorization': access_token, 
+        'ContentType':'application/json', 
+        'x-api-key' : lombda_key}
+    _params = {"path":"vector","db":file_name,"db_type":db_type, "apitoken":openai_api_key, "model":model, "num_results":num_results}
+    response = requests.post(f'{host}/content/query', 
+                            headers=headers, 
+                            params=_params,
+                            data=question)
+    
+    print(response.status_code)
+    print(response.text)
+    
+    if response.status_code != 200:
+        print(response.status_code)
+        print(response.text)
+        return response
+    
+    return json.loads(response.text)
+
+def retrieve_parents(question, file_name, access_token, lombda_key, openai_api_key, model, db_type, num_results: int = 3):
+    
+    #removed api from gateway for testing
+    
+    headers = {
+        'Authorization': access_token, 
+        'ContentType':'application/json', 
+        'x-api-key' : lombda_key}
+    _params = {"path":"parent","db":file_name,"db_type":db_type, "apitoken":openai_api_key, "model":model, "num_results":num_results}
+    response = requests.post(f'{host}/content/query', 
+                            headers=headers, 
+                            params=_params,
+                            data=question)
+    
+    print(response.status_code)
+    print(response.text)
+    
+    if response.status_code != 200:
+        print(response.status_code)
+        print(response.text)
+        return response
+    
+    return json.loads(response.text)
+
+def add_documents(access_token, collection, lombda_key, model, chunks):
+    #removed api from gateway for testing
+    headers = {
+        'Authorization': access_token, 
+        'ContentType':'application/json', 
+        'x-api-key' : lombda_key}
+    _params = {"path":"parent","db":collection,"db_type":"collection", "model":model}
+    response = requests.post(f'{host}/content/add', 
+                            headers=headers, 
+                            params=_params,
+                            data=json.dumps(chunks))
     
     print(response.status_code)
     print(response.text)

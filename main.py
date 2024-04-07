@@ -23,7 +23,8 @@ def get_access_token(url):
             print(f"reseting token = {token}")
             print(get_user_files(token))
             st.session_state["access_token"] = token
-            st.session_state["user"] = get_user_name(parameters["access_token"])
+            st.session_state["id_token"] = parameters["id_token"]
+            st.session_state["user"] = get_user_name(parameters["id_token"])
     return token
 
 def save_api_key(key):
@@ -51,6 +52,7 @@ def main():
         st.session_state["up_result"] = ""
         st.session_state["user"] = "default"
         st.session_state["access_token"] = ""
+        st.session_state["id_token"] = ""
         st.session_state["chat"] = Chat_Manager(st.session_state, "past")
         st.session_state["chatC"] = Chat_Manager(st.session_state, "pastC")
         st.session_state["lombda_key"] = ""
@@ -71,7 +73,8 @@ def main():
     user = st.session_state["user"] 
     st.subheader(f"Welcome: {user}") #Title
     
-    URL_STRING = "https://ragstudio.auth.us-east-1.amazoncognito.com/oauth2/authorize?client_id=1687t8u3293rqmnaji7m60pdss&response_type=token&scope=aws.cognito.signin.user.admin+email+openid+user-s3-resource-scope-id%2Freadwrite&redirect_uri=http%3A%2F%2Flocalhost%3A8501%2F"
+    client_key = "7unr6p79x79r44mxujwv4b6jq8"
+    URL_STRING = f"https://localhost.localstack.cloud/_aws/cognito-idp/login?response_type=token&client_id={client_key}&scope=aws.cognito.signin.user.admin+email+openid+user-s3-resource-scope-id%2Freadwrite&redirect_uri=http%3A%2F%2Flocalhost%3A8501%2F"
     st.markdown(
     f'<a href="{URL_STRING}" style="display: inline-block; padding: 12px 20px; background-color: #4CAF50; color: white; text-align: center; text-decoration: none; font-size: 16px; border-radius: 4px;" target="_self">Sign In Here</a>',
     unsafe_allow_html=True)
